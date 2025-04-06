@@ -8,6 +8,17 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import java.util.*;
 
+/**
+ * TemplateGeneratorBolt is responsible for creating subscription templates
+ * and coordinating the generation of publications and subscriptions.
+ *
+ * This bolt takes configuration parameters including publication count,
+ * subscription count, and desired distributions of fields and operators.
+ * It then:
+ * 1. Translates percentage-based distributions into exact counts
+ * 2. Generates subscription templates with specified field/operator combinations
+ * 3. Emits tasks to generate both publications and subscriptions
+ */
 public class TemplateGeneratorBolt extends BaseRichBolt {
     private OutputCollector collector;
 
@@ -16,6 +27,12 @@ public class TemplateGeneratorBolt extends BaseRichBolt {
         this.collector = collector;
     }
 
+    /**
+     * Core processing method that handles each incoming tuple.
+     * Generates publication tasks and subscription templates based on configuration.
+     *
+     * @param input Tuple containing generation parameters and distribution configs
+     */
     @Override
     public void execute(Tuple input) {
         try {
@@ -64,6 +81,15 @@ public class TemplateGeneratorBolt extends BaseRichBolt {
         }
     }
 
+    /**
+     * Generates subscription templates based on exact counts of fields and operators.
+     * Ensures that the resulting templates match the desired distribution exactly.
+     *
+     * @param count Total number of subscription templates to generate
+     * @param fieldCounts Map of field names to their exact occurrence counts
+     * @param equalityCounts Map of field names to their equality operator counts
+     * @return List of subscription templates with the specified distribution
+     */
     private List<SubscriptionTemplate> generateSubscriptionTemplates(
             int count, Map<String, Integer> fieldCounts, Map<String, Integer> equalityCounts) {
 

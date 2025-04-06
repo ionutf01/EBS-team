@@ -13,7 +13,18 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * SubscriptionTemplate represents the structure of a subscription filter
+ * before concrete values are assigned.
+ *
+ * This class serves as an intermediate representation that defines which fields
+ * will be included in a subscription and what operators will be used for filtering.
+ * It works as a blueprint that the SubscriptionGeneratorBolt will transform into
+ * a complete subscription with actual values.
+ */
 public class SubscriptionGeneratorBolt extends BaseRichBolt {
+
+    private static final java.util.concurrent.atomic.AtomicInteger subscriptionCount = new java.util.concurrent.atomic.AtomicInteger(0);
     private OutputCollector collector;
     private static final String[] CITIES = {"Bucharest", "Cluj", "Iasi", "Timisoara", "Constanta", "Brasov", "Craiova"};
     private static final String[] DIRECTIONS = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
@@ -33,6 +44,11 @@ public class SubscriptionGeneratorBolt extends BaseRichBolt {
 
         // Emit the subscription
         collector.emit(new Values(subscriptionId, subscription));
+
+        // Increment the subscription counter
+        subscriptionCount.incrementAndGet();
+
+        // Log progress periodically
         collector.ack(input);
     }
 
@@ -88,5 +104,14 @@ public class SubscriptionGeneratorBolt extends BaseRichBolt {
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declare(new Fields("subscriptionId", "subscription"));
+    }
+
+    /**
+     * Returns the current count of generated subscriptions.
+     *
+     * @return the number of subscriptions generated so far
+     */
+    public static int getSubscriptionCount() {
+        return subscriptionCount.get();
     }
 }

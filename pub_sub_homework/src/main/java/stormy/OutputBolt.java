@@ -11,6 +11,11 @@ import java.io.PrintWriter;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * OutputBolt serves as a terminal bolt in the Storm topology that writes
+ * generated data (publications or subscriptions) to output files.
+ * It also tracks performance metrics like generation count and elapsed time.
+ */
 public class OutputBolt extends BaseRichBolt {
     private OutputCollector collector;
     private final String outputType;
@@ -61,15 +66,30 @@ public class OutputBolt extends BaseRichBolt {
         collector.ack(input);
     }
 
+    /**
+     * Performs cleanup when the bolt is shutting down.
+     * Closes the file writer and logs final performance statistics.
+     */
     @Override
     public void cleanup() {
+        // Close the writer to ensure all data is flushed to disk
         if (writer != null) {
             writer.close();
         }
 
+        // Calculate final performance metrics
         long totalTime = System.currentTimeMillis() - startTime;
-        System.out.println("Finished generating " + count.get() + " " + outputType +
-                " in " + totalTime + " ms");
+        int totalCount = count.get();
+        double itemsPerSecond = (double) totalCount / (totalTime / 1000.0);
+        double msPerItem = (double) totalTime / totalCount;
+
+        // Print detailed performance summary
+        System.out.println("\n===== PERFORMANCE SUMMARY FOR " + outputType.toUpperCase() + " =====");
+        System.out.println("Total items generated: " + totalCount);
+        System.out.println("Total processing time: " + totalTime + " ms (" + (totalTime/1000.0) + " seconds)");
+        System.out.println("Average processing time: " + String.format("%.2f", msPerItem) + " ms per item");
+        System.out.println("Throughput: " + String.format("%.2f", itemsPerSecond) + " items/second");
+        System.out.println("=============================================\n");
     }
 
     @Override

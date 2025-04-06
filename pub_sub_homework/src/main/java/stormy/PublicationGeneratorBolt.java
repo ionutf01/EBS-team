@@ -13,7 +13,14 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * PublicationGeneratorBolt generates random weather data publications.
+ * This bolt receives publication IDs from upstream components and creates
+ * corresponding synthetic weather data with realistic parameters.
+ */
 public class PublicationGeneratorBolt extends BaseRichBolt {
+
+    private static final java.util.concurrent.atomic.AtomicInteger publishedCount = new java.util.concurrent.atomic.AtomicInteger(0);
     private OutputCollector collector;
     private static final String[] CITIES = {"Bucharest", "Cluj", "Iasi", "Timisoara", "Constanta", "Brasov", "Craiova"};
     private static final String[] DIRECTIONS = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
@@ -32,6 +39,11 @@ public class PublicationGeneratorBolt extends BaseRichBolt {
 
         // Emit the publication
         collector.emit(new Values(publicationId, publication));
+
+        // Increment the publication counter
+        publishedCount.incrementAndGet();
+
+        // Log progress periodically
         collector.ack(input);
     }
 
@@ -59,4 +71,14 @@ public class PublicationGeneratorBolt extends BaseRichBolt {
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declare(new Fields("publicationId", "publication"));
     }
+
+    /**
+     * Returns the current count of generated publications.
+     *
+     * @return the number of publications generated so far
+     */
+    public static int getPublishedCount() {
+        return publishedCount.get();
+    }
+
 }
