@@ -113,12 +113,12 @@ public class GeneratorTopology {
         // Choose execution mode based on command-line arguments
         if (args != null && args.length > 0) {
             // Cluster deployment mode
-            conf.setNumWorkers(3);  // Use 3 worker processes in the cluster
+            conf.setNumWorkers(6);  // Use 3 worker processes in the cluster
             conf.put(Config.WORKER_CHILDOPTS, "-Djava.security.manager=allow");
             StormSubmitter.submitTopologyWithProgressBar(args[0], conf, builder.createTopology());
         } else {
             // Local testing mode with embedded Storm cluster
-            conf.setMaxTaskParallelism(3);
+            conf.setMaxTaskParallelism(6);
             System.setProperty("java.security.manager", "allow");
 
             // Begin tracking overall execution time

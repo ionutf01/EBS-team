@@ -7,7 +7,6 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import org.example.Subscription;
 
 import java.time.LocalDate;
 import java.util.Map;
