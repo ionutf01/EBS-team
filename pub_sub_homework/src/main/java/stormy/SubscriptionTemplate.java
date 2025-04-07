@@ -4,6 +4,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * SubscriptionTemplate represents the structure of a subscription filter
+ * before concrete values are assigned.
+ *
+ * This class serves as an intermediate representation that defines which fields
+ * will be included in a subscription and what operators will be used for filtering.
+ * It works as a blueprint that the SubscriptionGeneratorBolt will transform into
+ * a complete subscription with actual values.
+ */
 public class SubscriptionTemplate implements Serializable {
     private final List<FieldOperator> fieldOperators = new ArrayList<>();
 
