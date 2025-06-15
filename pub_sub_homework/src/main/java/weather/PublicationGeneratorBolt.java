@@ -7,6 +7,8 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
+import weather.proto.PublicationProto;
+
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Random;
@@ -24,7 +26,19 @@ public class PublicationGeneratorBolt extends BaseRichBolt {
         System.out.println("PUBLICATION_GENERATOR: Received input tuple: " + input);
         int publicationId = input.getIntegerByField("publicationId");
         Publication publication = generateRandomPublication();
-        collector.emit(new Values(publicationId, publication));
+        byte[] serialized = PublicationProto.Publication.newBuilder()
+                .setStationId(publication.getStationId())
+                .setCity(publication.getCity())
+                .setTemp(publication.getTemp())
+                .setRain(publication.getRain())
+                .setWind(publication.getWind())
+                .setDirection(publication.getDirection())
+                .setDate(publication.getDate().toString())
+                .build()
+                .toByteArray();
+
+        collector.emit(new Values(publicationId, serialized));
+
         collector.ack(input);
     }
 

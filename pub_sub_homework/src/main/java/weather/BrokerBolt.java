@@ -1,5 +1,6 @@
 package weather;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -7,10 +8,14 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+//import weather.proto.PublicationProto.Publication;
 
 public class BrokerBolt extends BaseRichBolt {
     private OutputCollector collector;
@@ -52,7 +57,24 @@ public class BrokerBolt extends BaseRichBolt {
     }
 
     private void handlePublication(Tuple input) {
-        Publication pub = (Publication) input.getValueByField("publication");
+        byte[] serialized = (byte[]) input.getValueByField("publication");
+        weather.proto.PublicationProto.Publication proto = null;
+        try {
+            proto = weather.proto.PublicationProto.Publication.parseFrom(serialized);
+        } catch (InvalidProtocolBufferException e) {
+            throw new RuntimeException(e);
+        }
+
+        Publication pub = new Publication(
+                proto.getStationId(),
+                proto.getCity(),
+                proto.getTemp(),
+                proto.getRain(),
+                proto.getWind(),
+                proto.getDirection(),
+                LocalDate.parse(proto.getDate())
+        );
+
         for (Map.Entry<Integer, Subscription> entry : allSubscriptions.entrySet()) {
             Integer subId = entry.getKey();
             Subscription sub = entry.getValue();
