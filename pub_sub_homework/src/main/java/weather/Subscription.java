@@ -23,7 +23,7 @@ public class Subscription implements Serializable {
     @Override
     public String toString() { return "CONDITIONS" + conditions.toString(); }
 
-    private static class Condition implements Serializable {
+    public static class Condition implements Serializable {
         private final String field;
         private final String operator;
         private final Object value;
@@ -68,5 +68,12 @@ public class Subscription implements Serializable {
 
         @Override
         public String toString() { return "(" + field + "," + operator + "," + value + ")"; }
+
+        public Object getValue() {
+            return value;
+        }
+        public String getOperator() {
+            return operator;
+        }
     }
 }
