@@ -12,8 +12,9 @@ public class Publication implements Serializable {
     private final int wind;
     private final String direction;
     private final LocalDate date;
+    private final long emitTimeMillis;
 
-    public Publication(int stationId, String city, int temp, double rain, int wind, String direction, LocalDate date) {
+    public Publication(int stationId, String city, int temp, double rain, int wind, String direction, LocalDate date, long emitTimeMillis) {
         this.stationId = stationId;
         this.city = city;
         this.temp = temp;
@@ -21,6 +22,11 @@ public class Publication implements Serializable {
         this.wind = wind;
         this.direction = direction;
         this.date = date;
+        this.emitTimeMillis = emitTimeMillis;
+    }
+
+    public Publication(int stationId, String city, int temp, double rain, int wind, String direction, LocalDate date) {
+        this(stationId, city, temp, rain, wind, direction, date, System.currentTimeMillis());
     }
 
     public int getStationId() { return stationId; }
@@ -30,9 +36,12 @@ public class Publication implements Serializable {
     public int getWind() { return wind; }
     public String getDirection() { return direction; }
     public LocalDate getDate() { return date; }
+    public long getEmitTimeMillis() {
+        return emitTimeMillis;
+    }
 
     @Override
     public String toString() {
-        return "Publication{city='" + city + "', temp=" + temp + ", rain=" + rain + ", wind=" + wind + '}';
+        return "Publication{city='" + city + "', temp=" + temp + ", rain=" + rain + ", wind=" + wind + ", emitTimeMillis=" + emitTimeMillis + '}';
     }
 }

@@ -39,7 +39,7 @@ public class PublisherSpout extends BaseRichSpout {
         int wind = rand.nextInt(80);
         String direction = DIRECTIONS[rand.nextInt(DIRECTIONS.length)];
         LocalDate date = LocalDate.now();
-        return new Publication(stationId, city, temp, rain, wind, direction, date);
+        return new Publication(stationId, city, temp, rain, wind, direction, date, System.currentTimeMillis());
     }
 
     @Override
