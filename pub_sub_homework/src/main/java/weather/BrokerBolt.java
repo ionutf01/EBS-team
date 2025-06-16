@@ -23,8 +23,13 @@ public class BrokerBolt extends BaseRichBolt {
     private final int windowSize;
     private Map<Integer, Subscription> allSubscriptions;
     private Map<Integer, List<Publication>> tumblingWindowBuffers;
+    private static int matchedPublications = 0;
 
     public BrokerBolt(int windowSize) { this.windowSize = windowSize; }
+
+    public static int getMatchedCount() {
+        return matchedPublications;
+    }
 
     @Override
     public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
@@ -72,13 +77,15 @@ public class BrokerBolt extends BaseRichBolt {
                 proto.getRain(),
                 proto.getWind(),
                 proto.getDirection(),
-                LocalDate.parse(proto.getDate())
+                LocalDate.parse(proto.getDate()),
+                proto.getEmitTimeMillis()
         );
 
         for (Map.Entry<Integer, Subscription> entry : allSubscriptions.entrySet()) {
             Integer subId = entry.getKey();
             Subscription sub = entry.getValue();
             if (sub.matches(pub)) {
+                matchedPublications++;
                 if (sub instanceof WindowedSubscription) {
                     //Log pentru a vedea când se face o potrivire cu fereastra
                     System.out.println("BROKER " + brokerId + ": Tumbling window match found for sub " + subId + " with publication: " + pub);
@@ -91,8 +98,6 @@ public class BrokerBolt extends BaseRichBolt {
             }
         }
     }
-
-    // În fișierul BrokerBolt.java
 
     private void processTumblingWindow(Integer subId, WindowedSubscription sub, Publication pub) {
         List<Publication> buffer = tumblingWindowBuffers.get(subId);
@@ -108,7 +113,6 @@ public class BrokerBolt extends BaseRichBolt {
             System.out.println("BROKER " + brokerId + " [SubID " + subId + "]: Window is FULL. Evaluating conditions...");
 
             if (sub.checkWindow(buffer)) {
-                // Acest mesaj exista deja
                 System.out.println("BROKER " + brokerId + ": Tumbling window match for sub " + subId);
                 String city = pub.getCity();
                 String metaPublication = "{(city,=," + city + ");(conditions,=,true)}";

@@ -11,4 +11,5 @@ message Publication {
   int32 wind = 5;
   string direction = 6;
   string date = 7; // Serialize as ISO string (e.g., 2023-06-14)
+  int64 emitTimeMillis = 8;
 }

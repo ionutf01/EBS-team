@@ -34,6 +34,7 @@ public class PublicationGeneratorBolt extends BaseRichBolt {
                 .setWind(publication.getWind())
                 .setDirection(publication.getDirection())
                 .setDate(publication.getDate().toString())
+                .setEmitTimeMillis(publication.getEmitTimeMillis())
                 .build()
                 .toByteArray();
 
@@ -51,7 +52,7 @@ public class PublicationGeneratorBolt extends BaseRichBolt {
         int wind = rand.nextInt(101);
         String direction = DIRECTIONS[rand.nextInt(DIRECTIONS.length)];
         LocalDate date = LocalDate.ofEpochDay(LocalDate.of(2023, 1, 1).toEpochDay() + rand.nextInt(365*2));
-        return new Publication(stationId, city, temp, rain, wind, direction, date);
+        return new Publication(stationId, city, temp, rain, wind, direction, date, System.currentTimeMillis());
     }
 
     @Override

@@ -4,12 +4,15 @@ import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.utils.Utils;
+
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
 public class PublishSubscribeTopology {
-    private static final int MAX_PUBLICATIONS = 100;
-    private static final int MAX_SUBSCRIPTIONS = 20;
+    private static final int MAX_PUBLICATIONS = 10000;
+    private static final int MAX_SUBSCRIPTIONS = 10000;
     private static final int TUMBLING_WINDOW_SIZE = 3;
 
     public static void main(String[] args) throws Exception {
@@ -24,8 +27,10 @@ public class PublishSubscribeTopology {
         fieldFrequency.put("direction", 20);
         fieldFrequency.put("date", 10);
 
+        long runDuration = 3 * 60 * 1000; // 3 minutes in milliseconds
+
         Map<String, Integer> equalityFrequency = new HashMap<>();
-        equalityFrequency.put("city", 70);
+        equalityFrequency.put("city", 25);
 
         builder.setSpout("config-spout", new ConfigurationSpout(
                 MAX_PUBLICATIONS, MAX_SUBSCRIPTIONS, fieldFrequency, equalityFrequency), 1);
@@ -54,12 +59,17 @@ public class PublishSubscribeTopology {
         try {
             cluster.submitTopology("hybrid-pub-sub-topology", conf, builder.createTopology());
             System.out.println("APP LOG: Topologie pornită. Așteptăm finalizarea generării și procesării...");
-            Utils.sleep(60000);
+            Utils.sleep(runDuration);
         } finally {
             cluster.killTopology("hybrid-pub-sub-topology");
             cluster.shutdown();
             System.out.println("APP LOG: Topologia oprită.");
-            System.exit(0); // Uncomment if you want to exit the JVM after shutdown
+            System.out.println("===== EVALUARE SISTEM =====");
+            System.out.println("a) Publicații livrate cu succes: " + SubscriberBolt.getReceivedCount());
+            System.out.printf("b) Latență medie de livrare: %.2f ms%n", SubscriberBolt.getAverageLatency());
+            System.out.println("c) Publicații care au fost potrivite (matched): " + BrokerBolt.getMatchedCount());
+            System.out.println("============================");
+            System.exit(0);
         }
     }
 }
