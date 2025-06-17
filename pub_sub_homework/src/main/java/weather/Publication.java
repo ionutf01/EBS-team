@@ -42,7 +42,6 @@ public class Publication implements Serializable {
 
     @Override
     public String toString() {
-        return "Publication{city='" + city + "', temp=" + temp + ", rain=" + rain + ", wind=" + wind + ", emitTimeMillis=" + emitTimeMillis + 
-                ", date=" + date + ", stationId=" + stationId + ", direction='" + direction + "'}";
+        return "Publication{city='" + city + "', temp=" + temp + ", rain=" + rain + ", wind=" + wind + ", direction=" + direction + ", date=" + date + ", stationId=" + stationId + ", emitTimeMillis=" + emitTimeMillis + '}';
     }
 }
