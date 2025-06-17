@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PublishSubscribeTopology {
-    private static final int MAX_PUBLICATIONS = 10000;
-    private static final int MAX_SUBSCRIPTIONS = 10000;
+    private static final int MAX_PUBLICATIONS = 10;
+    private static final int MAX_SUBSCRIPTIONS = 10;
     private static final int TUMBLING_WINDOW_SIZE = 3;
 
     public static void main(String[] args) throws Exception {
